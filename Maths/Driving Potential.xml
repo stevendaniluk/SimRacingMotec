@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Maths Locale="English_United States.1252" DefaultLocale="C" Id="Driving Potential">
+ <MathConstants>
+  <MathConstant Name="DP dt smooth" Value="1.0" Unit="" Comment="Time window to smooth all data over"/>
+  <MathConstant Name="DP Use Lap Max" Value="1" Unit="" Value.Min="0" Value.Max="1" QuickEdit="1"/>
+ </MathConstants>
+ <MathItems>
+  <MathExpression Id="DP Ax" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="3" Interpolate="1" Script="smooth('Accel Long' [m/s/s], 'DP dt smooth' [])" SampleRate="0" Unit="m/s/s"/>
+  <MathExpression Id="DP Ay" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="2" Interpolate="1" Script="smooth('Accel Lat' [m/s/s], 'DP dt smooth' [])" SampleRate="0" Unit="m/s/s"/>
+  <MathExpression Id="DP Az" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="7" Interpolate="1" EnumerationName="" Script="-derivative(derivative(smooth('GNSS Altitude' [m], 2.0), 1.0), 1.0)" SampleRate="0" Unit="m/s/s"/>
+  <MathExpression Id="DP Ay Max" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="7" Interpolate="1" EnumerationName="" Script="'DP Ay Limit' [G] - 'DP Az' [G]" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ax Max Accel" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="5" Interpolate="1" EnumerationName="" Script="'DP Ax Limit Accel' [G] - 'DP Az' [G]" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ax Max Braking" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="6" Interpolate="1" EnumerationName="" Script="'DP Ax Limit Braking' [G] + 'DP Az' [G]" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ax Max" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="6" Interpolate="1" EnumerationName="" Script="(1.0 - 'Throttle' [ratio]) * abs('DP Ax Max Braking' [G]) + 'Throttle' [ratio] * 0.5 * (abs('DP Ax Max Accel' [G]) + abs('DP Ax Max Braking' [G]))" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ax Potential" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="2" Interpolate="1" Script="'DP Ax Max' [G] * sqrt(1.0 - power('DP Ay' [G] / 'DP Ay Max' [G], 2))" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ay Potential" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="4" Interpolate="1" Script="'DP Ay Max' [G] * sqrt(1.0 - power('DP Ax' [G] / 'DP Ax Max' [G], 2))" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Utilization" DisplayUnit="%" DisplayDPS="2" DisplayColorIndex="4" Interpolate="1" Script="choose('Throttle' [%] &gt; 95, 1.0, abs('DP Ax' [G] * sqrt(1.0 / power('DP Ax Max' [G], 2) + 1.0 / power('DP Ay Max' [G] * 'DP Ax' [G] / 'DP Ay' [G], 2))))" SampleRate="0" Unit="ratio"/>
+  <MathExpression Id="DP Ax Limit Accel" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="2" Interpolate="1" EnumerationName="" Script="choose('DP Use Lap Max' [] &gt; 0, 'DP Ax Limit Accel Lap Max' [G], 'DP Ax Limit Accel Session Max' [G])" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ax Limit Accel Lap Max" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="2" Interpolate="1" EnumerationName="" Script="stat_max('DP Ax' [G] + 'DP Az' [G], 1, range_change(&quot;Outings:Laps&quot;))" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ax Limit Accel Session Max" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="2" Interpolate="1" EnumerationName="" Script=" stat_max('DP Ax' [G] + 'DP Az' [G])" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ax Limit Braking" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="7" Interpolate="1" EnumerationName="" Script="choose('DP Use Lap Max' [] &gt; 0, 'DP Ax Limit Braking Lap Max' [G], 'DP Ax Limit Braking Session Max' [G])" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ax Limit Braking Lap Max" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="7" Interpolate="1" EnumerationName="" Script="stat_min('DP Ax' [G] - 'DP Az' [G], 1, range_change(&quot;Outings:Laps&quot;))" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ax Limit Braking Session Max" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="7" Interpolate="1" EnumerationName="" Script="stat_min('DP Ax' [G] - 'DP Az' [G])" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ay Limit" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="3" Interpolate="1" EnumerationName="" Script="choose('DP Use Lap Max' [] &gt; 0, 'DP Ay Limit Lap Max' [G], 'DP Ay Limit Session Max' [G])" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ay Limit Lap Max" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="3" Interpolate="1" EnumerationName="" Script="stat_max(abs('DP Ay' [G]) + 'DP Az' [G], 1, range_change(&quot;Outings:Laps&quot;))" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Ay Limit Session Max" DisplayUnit="G" DisplayDPS="2" DisplayColorIndex="3" Interpolate="1" EnumerationName="" Script="stat_max(abs('DP Ay' [G]) + 'DP Az' [G])" SampleRate="0" Unit="G"/>
+  <MathExpression Id="DP Utilization Lap Avg" DisplayUnit="%" DisplayDPS="2" DisplayColorIndex="0" Interpolate="1" EnumerationName="" Script="stat_mean('DP Utilization' [%], 1, range_change(&quot;Outings:Laps&quot;))" SampleRate="0" Unit="%"/>
+ </MathItems>
+</Maths>
